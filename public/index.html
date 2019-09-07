@@ -1,0 +1,87 @@
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+<title>Selection</title>
+    <link rel="stylesheet" href="selection.css">
+  </head>
+  <body>
+<div id="container"></div>
+    <div class="rect"></div>
+    <script>
+const size = 3;
+const array = [];
+let down = false;
+const origin = {r:"", c:"", x:"", y:""};
+const rect = document.querySelector(".rect");
+rect.style.visibility = "hidden";
+function Box(r,c){
+  const box = document.createElement('div');
+  box.className = 'block';
+  this.toggleLight=()=>{
+    box.classList.add('switch');
+  };
+  this.untoggle=()=>{
+    box.classList.remove('switch');
+  }
+ box.onmousedown=(e)=>{
+    down = true;
+    this.toggleLight();
+    origin.r = r;
+    origin.c = c;
+    origin.x = e.clientX;
+    origin.y = e.clientY;
+    rect.style.width = "0px";
+    rect.style.height = "0px";
+    rect.style.visbility = "visible";
+    rect.style.position = "absolute";
+  };
+  box.onmousemove=(e)=>{
+    if (down === false) return;
+    loop(array, {
+      sr: Math.min(r, origin.r),
+      er: Math.max(r, origin.r),
+      sc: Math.min(c, origin.c),
+      ec: Math.max(c, origin.c)
+    });
+const bm = Math.max(e.clientY, origin.y);
+    const tm = Math.min(e.clientY, origin.y);
+    const rm = Math.max(e.clientX, origin.x);
+    const lm = Math.min(e.clientX, origin.x);
+    rect.style.top = tm+"px";
+    rect.style.left = lm+"px";
+    rect.style.height = Math.abs(bm-tm)+"px";
+    rect.style.width = Math.abs(rm-lm)+"px";
+    rect.style.visibility = "visible";
+  };
+  box.onmouseup=()=>{
+    down = false;
+    rect.style.visibility = "hidden";
+  }
+ container.appendChild(box);
+};
+const loop=(arr, obj, i=0, j=0)=>{
+  if (i === size) return;
+  if (j === size) {
+    return loop(arr, obj, i+1, 0);
+  };
+  if(i>=obj.sr && i<=obj.er && j>=obj.sc && j<=obj.ec){
+    arr[i][j].toggleLight();
+  } else{
+    arr[i][j].untoggle();
+  }
+  return loop(arr, obj, i, j+1);
+};
+const build=(arr, i=0, j=0, temp=[])=>{
+  if (i === size) return arr;
+  if (j === size) { arr.push(temp)
+    return build(arr, i+1, j=0, temp=[]);
+  }
+  temp.push(new Box(i,j));
+  return build(arr, i, j+1, temp);
+}
+container.style.width = `${size*55}px`;
+build(array);
+    </script>
+  </body>
+</html>
